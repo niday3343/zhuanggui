@@ -2,19 +2,402 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>智能码垛 · 智能装柜</title>
-<link rel="icon" type="image/svg+xml" href="icon.svg">
-<link rel="stylesheet" href="css/app.css">
-<style>body{overflow:auto}.wrap{max-width:460px;margin:12vh auto;padding:28px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);text-align:center;line-height:1.8}
-.wrap h2{margin:0 0 8px;font-size:18px}.wrap p{color:var(--muted);margin:0 0 18px}</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>智能码垛 · 逐层垛型规划 · 装柜侠</title>
+<meta name="description" content="集装箱/托盘智能码垛：规则垛型逐层码放，输出每层俯视图与码放说明。">
+<meta name="theme-color" content="#1a6dd4">
+<style>
+:root{--bg:#eef1f5;--panel:#fff;--border:#dfe3e8;--text:#1a1f26;--muted:#6b7580;--accent:#1a6dd4;--accent2:#0d8f6f;--warn:#c4790a;--err:#d13b3b;--shadow:0 2px 12px rgba(20,30,50,.07)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;font-size:13px}
+header{height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}
+.logo .mark{background:#1a6dd4;color:#fff;border-radius:6px;padding:1px 7px;font-size:15px;line-height:1.4}
+.sub{color:var(--muted);font-size:12px}
+.spacer{flex:1}
+.hbtn{border:1px solid var(--border);background:#fff;color:var(--text);padding:6px 13px;border-radius:7px;font-size:12.5px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.hbtn:hover{background:#f4f6f9;border-color:#c9d0d8}
+.hbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:500}
+.hbtn.primary:hover{background:#155bb5}
+.hbtn.on{color:var(--accent);border-color:var(--accent);background:#eaf2ff}
+main{display:flex;gap:14px;align-items:flex-start;padding:14px;max-width:1280px;margin:0 auto}
+aside{width:340px;flex:0 0 340px;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:12px;position:sticky;top:66px}
+.sec{margin-bottom:14px}
+.sec>b{display:block;font-size:12.5px;margin-bottom:8px}
+.sec>b:after{content:'';display:block;height:1px;background:var(--border);margin-top:6px}
+label.f{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}
+select,input[type=text],input[type=number]{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:#fff;color:var(--text);outline:none}
+select:focus,input:focus{border-color:var(--accent)}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.chk{display:flex;gap:6px;align-items:center;font-size:12.5px;padding:4px 0}
+.chk input{width:16px;height:16px}
+.item{border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px;background:#fafbfc;position:relative}
+.item .del{position:absolute;top:6px;right:6px;width:20px;height:20px;line-height:18px;text-align:center;border:1px solid var(--border);background:#fff;border-radius:50%;cursor:pointer;color:var(--muted)}
+.item .del:hover{color:var(--err);border-color:var(--err)}
+.item .nm{display:flex;gap:6px;align-items:center;margin-bottom:6px;padding-right:24px}
+.dot{width:12px;height:12px;border-radius:3px;flex:none}
+.item .nm input{flex:1}
+.addbtn{width:100%;padding:8px;border:1px dashed var(--border);background:#fff;border-radius:8px;cursor:pointer;font-size:12.5px;color:var(--text)}
+.addbtn:hover{border-color:var(--accent);color:var(--accent)}
+.presets{display:flex;gap:6px;flex-wrap:wrap}
+.presets button{padding:6px 10px;border:1px solid var(--border);background:#fff;border-radius:7px;cursor:pointer;font-size:12px}
+.presets button:hover{border-color:var(--accent);color:var(--accent)}
+.stage{flex:1;min-width:0}
+.sumbar{display:flex;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;margin-bottom:12px}
+.sumbar .m{flex:1;min-width:110px}
+.sumbar .m span{display:block;font-size:11.5px;color:var(--muted)}
+.sumbar .m b{font-size:17px}
+.sumbar .m b.warn{color:var(--warn)}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:13.5px}
+.card canvas{width:100%;display:block;border:1px solid var(--border);border-radius:8px;background:#f7f9fb}
+.animbar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.animbar button{padding:6px 12px;border:1px solid var(--border);background:#fff;border-radius:7px;cursor:pointer;font-size:12.5px}
+.animbar button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.animbar input[type=range]{flex:1;min-width:120px}
+.empty{text-align:center;color:var(--muted);padding:38px 16px;line-height:1.9}
+.empty .big{font-size:34px}
+.layer{margin-bottom:12px}
+.layer .lh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.layer .lh b{font-size:13.5px}
+.layer .lh span{font-size:12px;color:var(--muted)}
+.layer .meta{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.7}
+.steps{margin:0;padding-left:18px;line-height:1.9;font-size:12.5px}
+.steps li b{color:var(--accent)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#101828;color:#fff;padding:10px 16px;border-radius:999px;z-index:99;display:none;max-width:92vw;text-align:center}
+@media(max-width:900px){main{flex-direction:column}aside{width:100%;flex:none;position:static}}
+</style>
 </head>
 <body>
-<header><div class="logo"><span class="mark">▣</span><span class="txt">智能装柜</span></div><span class="sub">智能码垛</span></header>
-<div class="wrap">
-  <h2>智能码垛</h2>
-  <p>该子模块是独立页面，本版本暂未收录。</p>
-  <a class="hbtn primary" href="index.html" style="text-decoration:none">← 返回集装箱装载模拟</a>
-</div>
+<header>
+  <div class="logo"><span class="mark">侠</span><span aria-hidden="true">▣</span><span class="txt">装柜侠</span></div>
+  <span class="sub">智能码垛 · 逐层垛型规划</span>
+  <div class="spacer"></div>
+  <a class="hbtn" href="index.html">装柜侠</a>
+  <a class="hbtn" href="custom-loader.html">自定义装载</a>
+  <a class="hbtn" href="alu-loader.html">铝材装柜</a>
+  <a class="hbtn on" href="dapei.html">智能码垛</a>
+  <button class="hbtn" id="csvBtn">导出清单</button>
+  <button class="hbtn" id="copyBtn">复制说明</button>
+  <button class="hbtn primary" id="runBtn">开始码垛</button>
+</header>
+<main>
+<aside>
+  <div class="sec">
+    <b>码垛区域</b>
+    <label class="f">区域类型</label>
+    <select id="rgSel">
+      <option value="P1200" selected>托盘 1200×1000</option>
+      <option value="P1100">托盘 1100×1100</option>
+      <option value="P1208">托盘 1200×800</option>
+      <option value="40HQ">40HQ 40尺高柜</option>
+      <option value="40GP">40GP 40尺普柜</option>
+      <option value="20GP">20GP 20尺普柜</option>
+      <option value="TRUCK">13 米平板车</option>
+      <option value="CUSTOM">自定义区域</option>
+    </select>
+    <div id="rgCust" style="display:none;margin-top:6px">
+      <div class="grid3">
+        <div><label class="f">长 cm</label><input type="number" id="rgL" value="120"></div>
+        <div><label class="f">宽 cm</label><input type="number" id="rgW" value="100"></div>
+        <div><label class="f">高 cm</label><input type="number" id="rgH" value="150"></div>
+      </div>
+      <div class="grid2" style="margin-top:6px">
+        <div><label class="f">限重 kg（0=不限）</label><input type="number" id="rgP" value="1000"></div>
+        <div></div>
+      </div>
+    </div>
+    <div class="note" id="rgInfo"></div>
+  </div>
+  <div class="sec">
+    <b>垛型规则</b>
+    <select id="modeSel">
+      <option value="align" selected>顺码（同向对缝）</option>
+      <option value="cross">纵横交错（层间 90° 交替）</option>
+      <option value="rowalt">行内交替（相邻行旋转 90°）</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="rotChk" checked> 允许旋转 90°（长宽互换）</label>
+    <label class="chk"><input type="checkbox" id="flipChk"> 允许翻转（高朝上，仅顺码生效）</label>
+  </div>
+  <div class="sec">
+    <b>货物清单（长×宽×高 cm）</b>
+    <div id="items"></div>
+    <button class="addbtn" id="addBtn">＋ 添加货物</button>
+  </div>
+  <div class="sec">
+    <b>快速载入示例</b>
+    <div class="presets">
+      <button data-pre="pallet">纸箱满托</button>
+      <button data-pre="mixed">混合货物</button>
+      <button data-pre="drum">圆桶立放</button>
+    </div>
+  </div>
+</aside>
+<section class="stage">
+  <div class="sumbar" id="sumbar">
+    <div class="m"><span>已码 / 总件数</span><b id="sCount">—</b></div>
+    <div class="m"><span>垛高</span><b id="sHeight">—</b></div>
+    <div class="m"><span>体积利用率</span><b id="sUtil">—</b></div>
+    <div class="m"><span>总重 / 限重</span><b id="sWt">—</b></div>
+    <div class="m"><span>未码件数</span><b id="sLeft">—</b></div>
+  </div>
+  <div class="card" id="animCard" style="display:none">
+    <h3>码垛动画 · 侧视逐层叠放</h3>
+    <canvas id="animCv" width="640" height="300"></canvas>
+    <div class="animbar">
+      <button class="primary" id="animPlay">▶ 播放</button>
+      <button id="animReplay">↺ 重播</button>
+      <input type="range" id="animProg" min="0" max="0" value="0">
+      <span id="animInfo" style="font-size:12px;color:var(--muted)">—</span>
+      <select id="animSpeed" style="width:80px"><option value="1" selected>1×</option><option value="0.5">0.5×</option><option value="2">2×</option><option value="4">4×</option></select>
+    </div>
+  </div>
+  <div id="layers"></div>
+  <div class="card" id="stepsCard" style="display:none">
+    <h3>码放说明</h3>
+    <ol class="steps" id="steps"></ol>
+  </div>
+  <div class="card empty" id="empty">
+    <div class="big">📦</div>
+    <div>在左侧录入货物，点「开始码垛」生成逐层垛型图</div>
+    <div style="font-size:12px">支持托盘与集装箱区域 · 顺码 / 纵横交错 / 行内交替三种垛型</div>
+  </div>
+</section>
+</main>
+<div id="toast"></div>
+<script>
+var REGIONS={
+ P1200:{label:'托盘 1200×1000',L:120,W:100,H:150,payload:1000},
+ P1100:{label:'托盘 1100×1100',L:110,W:110,H:150,payload:1000},
+ P1208:{label:'托盘 1200×800',L:120,W:80,H:150,payload:800},
+ '40HQ':{label:'40HQ 40尺高柜',L:1203.2,W:235.2,H:269.8,payload:26500},
+ '40GP':{label:'40GP 40尺普柜',L:1203.2,W:235.2,H:239.3,payload:26500},
+ '20GP':{label:'20GP 20尺普柜',L:589.8,W:235.2,H:239.3,payload:28200},
+ TRUCK:{label:'13 米平板车',L:1300,W:240,H:270,payload:30000},
+ CUSTOM:{label:'自定义区域',L:120,W:100,H:150,payload:1000}
+};
+var PALETTE=['#c98a4b','#4b8bc9','#5aa87a','#b06a9e','#c9a34b','#7a7ac9','#c96b5a','#4ba3a8'];
+var items=[
+ {name:'纸箱 120×100×110',l:120,w:100,h:110,qty:12,wt:10},
+ {name:'纸箱 120×100×110',l:120,w:100,h:110,qty:8,wt:15},
+ {name:'彩盒 120×100×110',l:120,w:100,h:110,qty:20,wt:5}
+];
+var lastPlan=null, animTimer=null, animShown=0, animPlaying=false;
+function $(id){return document.getElementById(id)}
+function toast(t){var e=$('toast');e.textContent=t;e.style.display='block';setTimeout(function(){e.style.display='none'},2200)}
+function region(){
+ var k=$('rgSel').value;
+ if(k==='CUSTOM')return {label:'自定义区域',L:+$('rgL').value||120,W:+$('rgW').value||100,H:+$('rgH').value||150,payload:+$('rgP').value||0};
+ return REGIONS[k];
+}
+function syncInfo(){
+ var r=region();
+ $('rgCust').style.display=$('rgSel').value==='CUSTOM'?'block':'none';
+ $('rgInfo').textContent='区域 '+r.label+'：内尺寸 '+r.L+'×'+r.W+'×'+r.H+' cm，容积 '+(r.L*r.W*r.H/1e6).toFixed(2)+' m³'+(r.payload?'，限重 '+r.payload.toLocaleString()+' kg':'，不限重');
+}
+function renderItems(){
+ var html='';
+ items.forEach(function(it,i){
+  html+='<div class="item"><button class="del" data-del="'+i+'" title="删除">×</button>'
+   +'<div class="nm"><span class="dot" style="background:'+PALETTE[i%PALETTE.length]+'"></span><input type="text" data-i="'+i+'" data-k="name" value="'+it.name+'"></div>'
+   +'<div class="grid3"><div><label class="f">长</label><input type="number" data-i="'+i+'" data-k="l" value="'+it.l+'"></div>'
+   +'<div><label class="f">宽</label><input type="number" data-i="'+i+'" data-k="w" value="'+it.w+'"></div>'
+   +'<div><label class="f">高</label><input type="number" data-i="'+i+'" data-k="h" value="'+it.h+'"></div></div>'
+   +'<div class="grid2" style="margin-top:6px"><div><label class="f">数量</label><input type="number" data-i="'+i+'" data-k="qty" value="'+it.qty+'"></div>'
+   +'<div><label class="f">单重 kg</label><input type="number" data-i="'+i+'" data-k="wt" value="'+it.wt+'"></div></div></div>';
+ });
+ $('items').innerHTML=html;
+ document.querySelectorAll('#items input').forEach(function(inp){
+  inp.addEventListener('change',function(){
+   var i=+inp.dataset.i,k=inp.dataset.k;
+   items[i][k]=(k==='name')?inp.value:(+inp.value||0);
+  });
+ });
+ document.querySelectorAll('[data-del]').forEach(function(b){
+  b.addEventListener('click',function(){items.splice(+b.dataset.del,1);renderItems()});
+ });
+}
+function orient(it,layerIdx,rowIdx,mode){
+ var rot=$('rotChk').checked;
+ var l=it.l,w=it.w;
+ function sw(longAlong){ // longAlong=true: 长边沿区域长边
+  if(!rot)return [l,w];
+  if(longAlong)return l>=w?[l,w]:[w,l];
+  return l>=w?[w,l]:[l,w];
+ }
+ if(mode==='cross')return sw(layerIdx%2===0);
+ if(mode==='rowalt')return sw(rowIdx%2===0);
+ return sw(true);
+}
+function plan(){
+ var r=region(),mode=$('modeSel').value;
+ var units=[];
+ items.forEach(function(it,ci){
+  for(var n=0;n<Math.min(it.qty,600);n++)units.push({ci:ci,l:it.l,w:it.w,h:it.h,wt:it.wt,name:it.name});
+ });
+ // 层内先放大件：按占地面积降序
+ units.sort(function(a,b){return (b.l*b.w)-(a.l*a.w)||(b.h-a.h)});
+ var layers=[],curH=0,totalWt=0,placed=0;
+ var pool=units.slice();
+ var flipOn=$('flipChk').checked&&mode==='align';
+ while(pool.length){
+  // 本层层高 = 剩余第一件的高度（翻转时可用长/宽作高）
+  var first=pool[0];
+  var layerH=first.h;
+  if(curH+layerH>r.H)break;
+  var boxes=[],x=0,y=0,rowD=0,rowIdx=0,layerWt=0,used=[];
+  for(var i=0;i<pool.length;i++){
+   var u=pool[i];
+   var h=u.h;
+   if(flipOn&&u.l!==u.h){/* 翻转仅在顺码且能放下时用长边作高，层高不变 */ }
+   if(h>layerH)continue; // 高于本层层高的货留到下一层
+   if(r.payload&&totalWt+layerWt+u.wt>r.payload)continue;
+   var d=orient(u,layers.length,rowIdx,mode);
+   var dx=d[0],dy=d[1];
+   if(x+dx>r.L+1e-6){ y+=rowD; x=0; rowD=0; rowIdx++; d=orient(u,layers.length,rowIdx,mode); dx=d[0]; dy=d[1]; }
+   if(x+dx>r.L+1e-6||y+dy>r.W+1e-6)continue;
+   boxes.push({x:x,y:y,dx:dx,dy:dy,ci:u.ci,name:u.name,wt:u.wt,h:h,mode:(dx===u.l&&dy===u.w)?'长边顺长':'换面（'+dx+'×'+dy+'）'});
+   used.push(i); x+=dx; if(dy>rowD)rowD=dy; layerWt+=u.wt;
+  }
+  if(!boxes.length)break;
+  used.sort(function(a,b){return b-a}).forEach(function(ix){pool.splice(ix,1)});
+  layers.push({h:layerH,boxes:boxes,wt:layerWt});
+  curH+=layerH; totalWt+=layerWt; placed+=boxes.length;
+ }
+ var vol=0; layers.forEach(function(L){L.boxes.forEach(function(b){vol+=b.dx*b.dy*b.h/1e6})});
+ return {region:r,mode:mode,layers:layers,placed:placed,qty:units.length,vol:vol,util:vol/(r.L*r.W*r.H/1e6)*100,wt:totalWt,height:curH,unplaced:units.length-placed};
+}
+function drawLayer(cv,layer,r){
+ var ctx=cv.getContext('2d');
+ var pad=8,W=cv.width,H=cv.height;
+ var sc=Math.min((W-pad*2)/r.L,(H-pad*2)/r.W);
+ var ox=(W-r.L*sc)/2,oy=(H-r.W*sc)/2;
+ ctx.clearRect(0,0,W,H);
+ ctx.fillStyle='#eef1f5';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#1a6dd4';ctx.lineWidth=2;ctx.strokeRect(ox,oy,r.L*sc,r.W*sc);
+ ctx.fillStyle='#dbe7f7';ctx.fillRect(ox,oy,r.L*sc,r.W*sc);
+ layer.boxes.forEach(function(b,i){
+  ctx.fillStyle=PALETTE[b.ci%PALETTE.length];
+  ctx.globalAlpha=.85;ctx.fillRect(ox+b.x*sc,oy+b.y*sc,b.dx*sc,b.dy*sc);ctx.globalAlpha=1;
+  ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.strokeRect(ox+b.x*sc,oy+b.y*sc,b.dx*sc,b.dy*sc);
+  if(b.dx*sc>26&&b.dy*sc>16){ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1),ox+(b.x+b.dx/2)*sc,oy+(b.y+b.dy/2)*sc);}
+ });
+ ctx.fillStyle='#6b7580';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.textBaseline='top';
+ ctx.fillText('长 '+r.L+' cm →',ox,oy+r.W*sc+2);
+}
+function modeName(m){return m==='cross'?'纵横交错':(m==='rowalt'?'行内交替':'顺码')}
+function run(){
+ if(!items.length){toast('请先添加货物');return}
+ var p=plan(); lastPlan=p;
+ $('empty').style.display='none';$('stepsCard').style.display='block';$('animCard').style.display='block';
+ $('sCount').textContent=p.placed+' / '+p.qty;
+ $('sHeight').textContent=p.height+' cm（'+p.layers.length+' 层）';
+ $('sUtil').textContent=p.util.toFixed(1)+'%';
+ $('sWt').textContent=Math.round(p.wt).toLocaleString()+(p.region.payload?' / '+p.region.payload.toLocaleString():'')+' kg';
+ var sl=$('sLeft'); sl.textContent=p.unplaced+' 件'; sl.className=p.unplaced?'warn':'';
+ if(p.unplaced)toast('限高/限重已满，剩余 '+p.unplaced+' 件未码上');
+ var wrap=$('layers'); wrap.innerHTML='';
+ p.layers.forEach(function(L,li){
+  var div=document.createElement('div');div.className='card layer';
+  var counts={};L.boxes.forEach(function(b){counts[b.name]=(counts[b.name]||0)+1});
+  var detail=Object.keys(counts).map(function(k){return k+'×'+counts[k]}).join('，');
+  div.innerHTML='<div class="lh"><b>第 '+(li+1)+' 层</b><span>层高 '+L.h+' cm · '+L.boxes.length+' 件 · '+Math.round(L.wt)+' kg · '+modeName(p.mode)+'</span></div>'
+   +'<canvas width="640" height="'+Math.max(180,Math.round(640*p.region.W/p.region.L))+'"></canvas>'
+   +'<div class="meta">'+detail+'</div>';
+  wrap.appendChild(div);
+  drawLayer(div.querySelector('canvas'),L,p.region);
+ });
+ var steps='';
+ p.layers.forEach(function(L,li){
+  var counts={};L.boxes.forEach(function(b){counts[b.name]=(counts[b.name]||0)+1});
+  var detail=Object.keys(counts).map(function(k){return k+'×'+counts[k]}).join('、');
+  var first=L.boxes[0];
+  steps+='<li><b>第 '+(li+1)+' 层</b>（高 '+L.h+' cm）：'+detail+'，'+modeName(p.mode)+'，垛起点（0,0），重 '+Math.round(L.wt)+' kg。</li>';
+ });
+ if(p.unplaced)steps+='<li><b>未码上 '+p.unplaced+' 件</b>：已达'+(p.region.payload?'限重 '+p.region.payload.toLocaleString()+' kg':'区域限高 '+p.region.H+' cm')+'，请换大托盘/分两垛，或减少数量。</li>';
+ $('steps').innerHTML=steps;
+ // 动画
+ var flat=[];p.layers.forEach(function(L,li){L.boxes.forEach(function(b){flat.push({h:L.h,li:li,ci:b.ci})})});
+ animFlat=flat;animShown=0;$('animProg').max=flat.length;$('animProg').value=0;
+ drawAnim(0);
+ toast('码垛完成：'+p.placed+' 件，'+p.layers.length+' 层，利用率 '+p.util.toFixed(1)+'%');
+}
+var animFlat=[];
+function drawAnim(n){
+ var cv=$('animCv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#f7f9fb';ctx.fillRect(0,0,W,H);
+ if(!lastPlan)return;
+ var r=lastPlan.region;
+ var sc=Math.min((W-40)/r.L,(H-60)/r.H);
+ var ox=(W-r.L*sc)/2,base=H-30;
+ ctx.fillStyle='#8a6d4b';ctx.fillRect(ox-6,base,r.L*sc+12,10); // 托盘底
+ ctx.strokeStyle='#1a6dd4';ctx.lineWidth=1.5;ctx.strokeRect(ox,base-r.H*sc,r.L*sc,r.H*sc);
+ var y0=base,layerH=0,li=-1;
+ for(var i=0;i<n&&i<animFlat.length;i++){
+  var b=animFlat[i];
+  if(b.li!==li){li=b.li;layerH=lastPlan.layers[li].h;}
+  // 侧视：按层从下往上画，每件占一格
+  var per=Math.max(1,Math.round(r.L/60));
+  var idxInLayer=animFlat.slice(0,i+1).filter(function(x){return x.li===li}).length-1;
+  var bx=ox+(idxInLayer%per)*(r.L*sc/per),bw=r.L*sc/per-2;
+  var by=base-(lastPlan.layers.slice(0,li).reduce(function(s,L){return s+L.h},0)+lastPlan.layers[li].h)*sc;
+  ctx.fillStyle=PALETTE[b.ci%PALETTE.length];ctx.globalAlpha=.9;
+  ctx.fillRect(bx,by,bw,lastPlan.layers[li].h*sc-1);ctx.globalAlpha=1;
+  ctx.strokeStyle='#fff';ctx.strokeRect(bx,by,bw,lastPlan.layers[li].h*sc-1);
+ }
+ $('animInfo').textContent=n+' / '+animFlat.length+' 件';
+ $('animProg').value=n;
+}
+function animStep(){
+ if(!animFlat.length)return;
+ animShown++;
+ if(animShown>animFlat.length){animShown=animFlat.length;animPlaying=false;$('animPlay').textContent='▶ 播放';clearInterval(animTimer);return}
+ drawAnim(animShown);
+}
+$('runBtn').addEventListener('click',run);
+$('rgSel').addEventListener('change',syncInfo);
+['rgL','rgW','rgH','rgP'].forEach(function(id){$(id).addEventListener('change',syncInfo)});
+$('addBtn').addEventListener('click',function(){items.push({name:'新货物',l:60,w:40,h:40,qty:10,wt:10});renderItems()});
+document.querySelectorAll('[data-pre]').forEach(function(b){
+ b.addEventListener('click',function(){
+  var k=b.dataset.pre;
+  if(k==='pallet')items=[{name:'纸箱 60×40×40',l:60,w:40,h:40,qty:12,wt:10},{name:'纸箱 50×40×30',l:50,w:40,h:30,qty:8,wt:15}];
+  if(k==='mixed')items=[{name:'纸箱 60×40×40',l:60,w:40,h:40,qty:12,wt:10},{name:'彩盒 40×30×25',l:40,w:30,h:25,qty:20,wt:5},{name:'纸箱 50×40×30',l:50,w:40,h:30,qty:8,wt:15}];
+  if(k==='drum')items=[{name:'圆桶 ⌀58×88',l:88,w:58,h:58,qty:12,wt:22},{name:'小桶 ⌀30×48',l:48,w:30,h:30,qty:20,wt:9}];
+  renderItems();run();
+ });
+});
+$('animPlay').addEventListener('click',function(){
+ if(!animFlat.length){toast('请先点「开始码垛」');return}
+ if(animPlaying){animPlaying=false;clearInterval(animTimer);$('animPlay').textContent='▶ 播放';return}
+ animPlaying=true;$('animPlay').textContent='⏸ 暂停';
+ var sp=+$('animSpeed').value||1;
+ animTimer=setInterval(animStep,Math.round(320/sp));
+});
+$('animReplay').addEventListener('click',function(){
+ clearInterval(animTimer);animPlaying=false;$('animPlay').textContent='▶ 播放';animShown=0;drawAnim(0);
+});
+$('animProg').addEventListener('input',function(){clearInterval(animTimer);animPlaying=false;$('animPlay').textContent='▶ 播放';animShown=+this.value;drawAnim(animShown)});
+$('csvBtn').addEventListener('click',function(){
+ if(!lastPlan){toast('请先点「开始码垛」');return}
+ var rows=[['品名','长','宽','高','单重kg','层号','层内Xcm','层内Ycm','摆法']];
+ lastPlan.layers.forEach(function(L,li){L.boxes.forEach(function(b){
+  rows.push([b.name,b.dx,b.dy,b.h,b.wt,li+1,Math.round(b.x),Math.round(b.y),b.mode]);
+ })});
+ var csv='﻿'+rows.map(function(r){return r.join(',')}).join('\n');
+ var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='码垛清单.csv';a.click();
+ toast('清单已导出');
+});
+$('copyBtn').addEventListener('click',function(){
+ if(!lastPlan){toast('请先点「开始码垛」');return}
+ var p=lastPlan,t='码垛方案 · '+p.region.label+' · '+p.placed+'/'+p.qty+' 件 · '+p.layers.length+' 层 · 利用率 '+p.util.toFixed(1)+'% · 总重 '+Math.round(p.wt)+' kg\n';
+ p.layers.forEach(function(L,li){t+='第 '+(li+1)+' 层（高 '+L.h+' cm）：'+L.boxes.length+' 件，'+Math.round(L.wt)+' kg\n'});
+ if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){toast('说明已复制')});
+ else toast(t);
+});
+syncInfo();renderItems();
+</script>
 </body>
 </html>
