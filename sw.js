@@ -1,4 +1,4 @@
-/* 智能装柜 · 离线缓存（页面网络优先，静态资源缓存优先） */
+/* 装柜侠 · 离线缓存（页面网络优先，静态资源缓存优先） */
 const CACHE = 'zhuanggui-v1';
 const ASSETS = [
   './', './index.html', './css/app.css',

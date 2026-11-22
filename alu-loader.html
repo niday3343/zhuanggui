@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>铝材装柜 · 专用排柜</title>
+<title>铝材装柜 · 专用排柜 · 装柜侠</title>
 <meta name="theme-color" content="#1a6dd4">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:,">
@@ -14,6 +14,7 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;}
+  body{height:100vh; height:100dvh;}
   body{
     background:var(--bg); color:var(--text);
     font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -94,7 +95,7 @@
   #ctabs button.on{background:var(--accent); border-color:var(--accent); color:#fff;}
   /* ---------- 3D 区 ---------- */
   #stageWrap{flex:1; position:relative; min-width:0;}
-  #cv{width:100%; height:100%; display:block;}
+  #cv{width:100%; height:100%; display:block; touch-action:none;}
   .overlay{
     position:absolute; left:12px; bottom:12px; background:rgba(255,255,255,.92);
     border:1px solid var(--border); border-radius:10px; padding:8px 14px; font-size:12px; color:var(--muted);
@@ -165,10 +166,13 @@
 
   /* 移动端 */
   @media (max-width:820px){
-    main{flex-direction:column;}
-    #side{flex:0 0 auto; max-height:38vh; border-right:none; border-bottom:1px solid var(--border);}
-    #stageWrap{flex:1 1 0; min-height:270px;}
-    .tools{top:8px; right:8px;}
+    main{flex-direction:column; padding-bottom:env(safe-area-inset-bottom);}
+    #side{flex:0 0 auto; max-height:30vh; border-right:none; border-bottom:1px solid var(--border);}
+    #stageWrap{flex:1 1 auto; min-height:52vh; min-height:52dvh;}
+    .tools{top:8px; right:8px; left:8px; justify-content:flex-end; flex-wrap:wrap;}
+    .tools button{padding:7px 10px; font-size:12px;}
+    .overlay{display:none;}
+    #empty3d{bottom:calc(12px + env(safe-area-inset-bottom));}
     .modal-bg{padding:0; align-items:flex-end;}
     .modal{max-width:100%; border-radius:16px 16px 0 0; max-height:92dvh; padding:18px 16px;
       padding-bottom:calc(18px + env(safe-area-inset-bottom));}
@@ -249,8 +253,8 @@
 <body>
 <header>
   <div class="logo">
-    <div class="mark">▣</div>
-    <div><b>铝材装柜</b><div class="sub">型材专用 · 规格自定义 · 自动斜放</div></div>
+    <div class="mark">侠</div>
+    <div><b>装柜侠 · 铝材装柜</b><div class="sub">型材专用 · 规格自定义 · 自动斜放</div></div>
   </div>
   <div class="hspacer"></div>
   <div class="chips">
@@ -1575,6 +1579,8 @@ function init3D() {
   scene.add(containerGroup, cargoGroup);
 
   window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', function(){ setTimeout(resize, 350); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
   resize();
   (function loop(now) {
     requestAnimationFrame(loop);

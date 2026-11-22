@@ -67,7 +67,8 @@ select:focus,input:focus{border-color:var(--accent)}
 .steps{margin:0;padding-left:18px;line-height:1.9;font-size:12.5px}
 .steps li b{color:var(--accent)}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#101828;color:#fff;padding:10px 16px;border-radius:999px;z-index:99;display:none;max-width:92vw;text-align:center}
-@media(max-width:900px){main{flex-direction:column}aside{width:100%;flex:none;position:static}}
+@media(max-width:900px){main{flex-direction:column;padding-bottom:calc(96px + env(safe-area-inset-bottom))}aside{width:100%;flex:none;position:static}}
+#toast{bottom:calc(22px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
@@ -123,6 +124,7 @@ select:focus,input:focus{border-color:var(--accent)}
   </div>
   <div class="sec">
     <b>货物清单（长×宽×高 cm）</b>
+    <div class="note">默认货物 120×100×110cm：托盘 1200×1000 每层只能放 1 件，限高 150cm 只能码 1 层，剩余件数会如实显示为未码上。标“演示示例”的小箱子用来演示多层码垛。</div>
     <div id="items"></div>
     <button class="addbtn" id="addBtn">＋ 添加货物</button>
   </div>
@@ -179,10 +181,13 @@ var REGIONS={
  CUSTOM:{label:'自定义区域',L:120,W:100,H:150,payload:1000}
 };
 var PALETTE=['#c98a4b','#4b8bc9','#5aa87a','#b06a9e','#c9a34b','#7a7ac9','#c96b5a','#4ba3a8'];
+// 默认货物：用户定的 120×100×110cm。120×100cm 的箱子在一块 1200×1000 托盘上每层只能放 1 件，
+// 110cm 高在 150cm 限高内只能码 1 层——这是按真实尺寸算出的结果，不是程序错。
+// 下面两组小尺寸箱子是演示示例（已在品名里标明），用来演示多层码垛。
 var items=[
- {name:'纸箱 120×100×110',l:120,w:100,h:110,qty:12,wt:10},
- {name:'纸箱 120×100×110',l:120,w:100,h:110,qty:8,wt:15},
- {name:'彩盒 120×100×110',l:120,w:100,h:110,qty:20,wt:5}
+ {name:'木箱 120×100×110',l:120,w:100,h:110,qty:4,wt:65},
+ {name:'纸箱 60×40×40（演示示例）',l:60,w:40,h:40,qty:12,wt:10},
+ {name:'彩盒 40×30×25（演示示例）',l:40,w:30,h:25,qty:20,wt:5}
 ];
 var lastPlan=null, animTimer=null, animShown=0, animPlaying=false;
 function $(id){return document.getElementById(id)}
@@ -243,10 +248,12 @@ function plan(){
  var pool=units.slice();
  var flipOn=$('flipChk').checked&&mode==='align';
  while(pool.length){
-  // 本层层高 = 剩余第一件的高度（翻转时可用长/宽作高）
-  var first=pool[0];
-  var layerH=first.h;
-  if(curH+layerH>r.H)break;
+  // 本层层高 = 剩余货物里第一件“高度还能放进剩余限高”的货的高度。
+  // （修：以前直接取第一件，120×100×110 的大箱放不进剩余 40cm 时就整垛停了，
+  //  后面的小箱明明能码也不码。改后会跳过放不下的大箱，先码小箱。）
+  var layerH=0;
+  for(var fi=0;fi<pool.length;fi++){ if(curH+pool[fi].h<=r.H){ layerH=pool[fi].h; break; } }
+  if(!layerH)break;
   var boxes=[],x=0,y=0,rowD=0,rowIdx=0,layerWt=0,used=[];
   for(var i=0;i<pool.length;i++){
    var u=pool[i];

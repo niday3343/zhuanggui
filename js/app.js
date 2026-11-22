@@ -1,5 +1,5 @@
 /* =========================================================
-   智能装柜 · 界面与交互
+   装柜侠 · 界面与交互
    ========================================================= */
 import * as Packer from './packer.js';
 import { smartPackPlan } from './smart.js';
@@ -34,7 +34,11 @@ const PRESETS = {
   machinery: { label: '机械重货（超重演示）', items: [
     { name: '木箱机械 120×100×110', l: 120, w: 100, h: 110, qty: 30, weight: 900, rotate: false },
     { name: '配件箱 80×60×60', l: 80, w: 60, h: 60, qty: 30, weight: 95 }] },
-  mixed: { label: '混合货物', items: [
+  mixed: { label: '我的货物 120×100×110', items: [
+    { name: '木箱 120×100×110', l: 120, w: 100, h: 110, qty: 30, weight: 65, rotate: false },
+    { name: '纸箱 60×40×40', l: 60, w: 40, h: 40, qty: 120, weight: 10 },
+    { name: '长条件 200×30×30', l: 200, w: 30, h: 30, qty: 30, weight: 18 }] },
+  classic: { label: '原站默认 166件', items: [
     { name: '纸箱 60×40×40', l: 60, w: 40, h: 40, qty: 120, weight: 10 },
     { name: '托盘货 110×110×120', l: 110, w: 110, h: 120, qty: 16, weight: 380, rotate: false },
     { name: '长条件 200×30×30', l: 200, w: 30, h: 30, qty: 30, weight: 18 }] }
@@ -44,7 +48,7 @@ const SHAPES = [['box', '方箱'], ['cyl', '圆柱/卷'], ['sphere', '圆形件'
 const POSES = [['auto', '自动·装最多'], ['flat', '平放'], ['upright', '竖放'], ['side', '侧立']];
 const SHAPE_CN = { box: '方箱', cyl: '圆柱', sphere: '圆形件' };
 
-const PLAN_KEY = 'zhuanggui.plan.v1';
+const PLAN_KEY = 'zhuangguixia.plan.v1';
 const CUST_KEY = 'zhuanggui.custombox.v1';
 
 const state = { container: '40HQ', items: [], result: null, seq: 0 };
@@ -698,7 +702,7 @@ async function sharePlan() {
   const st = state.result && state.result.stats;
   const text = '装柜方案 ' + state.container + (st ? ' · ' + st.placedCount + ' 件 · 装载率 ' + (st.utilization * 100).toFixed(1) + '%' : '');
   if (navigator.share) {
-    try { await navigator.share({ title: '智能装柜方案', text, url }); return; }
+    try { await navigator.share({ title: '装柜侠方案', text, url }); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
   }
   copyText(url);
@@ -828,9 +832,9 @@ function boot() {
     if (panel === 'items') setTimeout(openSheet, 260);
 
     try {
-      if (isSmall() && !localStorage.getItem('zhuanggui.tip')) {
+      if (isSmall() && !localStorage.getItem('zhuangguixia.tip')) {
         setTimeout(() => toast('点右上角「清单」改货，拖动画布可旋转'), 1200);
-        localStorage.setItem('zhuanggui.tip', '1');
+        localStorage.setItem('zhuangguixia.tip', '1');
       }
     } catch (e) { /* 忽略 */ }
 
