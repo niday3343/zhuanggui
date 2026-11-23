@@ -1,5 +1,5 @@
-/* 装柜侠 · 离线缓存（页面网络优先，静态资源缓存优先） */
-const CACHE = 'zhuanggui-v1795443230';
+/* 智装柜 · 离线缓存（页面网络优先，静态资源缓存优先） */
+const CACHE = 'zhuanggui-v202611232240';
 const ASSETS = [
   './', './index.html', './css/app.css',
   './js/app.js', './js/geom.js', './js/packer.js', './js/smart.js', './js/scene.js', './js/importer.js',

@@ -1,6 +1,6 @@
 {
-  "name": "装柜侠 · 集装箱装载模拟",
-  "short_name": "装柜侠",
+  "name": "智装柜 · 集装箱装载模拟",
+  "short_name": "智装柜",
   "description": "外贸集装箱 3D 装柜模拟：自动排柜、装载动画、装载顺序、Excel 导入",
   "lang": "zh-CN",
   "start_url": "./",

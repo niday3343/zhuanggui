@@ -1,5 +1,5 @@
 /* =========================================================
-   装柜侠 · 界面与交互
+   智装柜 · 界面与交互
    ========================================================= */
 import * as Packer from './packer.js';
 import { smartPackPlan } from './smart.js';
@@ -702,7 +702,7 @@ async function sharePlan() {
   const st = state.result && state.result.stats;
   const text = '装柜方案 ' + state.container + (st ? ' · ' + st.placedCount + ' 件 · 装载率 ' + (st.utilization * 100).toFixed(1) + '%' : '');
   if (navigator.share) {
-    try { await navigator.share({ title: '装柜侠方案', text, url }); return; }
+    try { await navigator.share({ title: '智装柜方案', text, url }); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
   }
   copyText(url);

@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>装柜侠 · 集装箱装载模拟</title>
-<meta name="description" content="装柜侠 · 外贸集装箱 3D 装柜模拟：自动排柜、装载顺序、Excel 导入，手机浏览器直接打开。">
+<title>智装柜 · 集装箱装载模拟</title>
+<meta name="description" content="智装柜 · 外贸集装箱 3D 装柜模拟：自动排柜、装载顺序、Excel 导入，手机浏览器直接打开。">
 <meta name="theme-color" content="#1a6dd4">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="装柜侠">
+<meta name="apple-mobile-web-app-title" content="智装柜">
 <meta name="format-detection" content="telephone=no">
 <link rel="stylesheet" href="css/app.css">
 <script type="importmap">
@@ -29,14 +29,15 @@
 <div id="boot"><div class="spin"></div><div class="msg">正在加载 3D 引擎…</div></div>
 
 <header>
-  <div class="logo"><span class="mark">侠</span><span class="txt">装柜侠</span></div>
+  <div class="logo"><span class="mark">智</span><span class="txt">智装柜</span></div>
   <span class="sub">集装箱装载模拟 · LAFF + 极值点算法</span>
-  <div class="spacer"></div>
+  <div class="hbtns">
   <button class="hbtn only-d" id="csvBtn">导出装载清单</button>
   <button class="hbtn" id="shareBtn" title="生成可分享的方案链接">分享</button>
   <button class="hbtn smart" id="smartBtn" title="横竖侧立混排 + 重量均衡，自动装满整柜并演示装载"><span class="only-d">🤖 智能满载</span><span class="only-m">🤖 满载</span></button>
   <button class="hbtn primary" id="packBtn"><span class="only-d">重新排柜</span><span class="only-m">排柜</span></button>
   <button class="hbtn only-m" id="sheetBtn">清单</button>
+  </div>
 </header>
 
 <main>

@@ -1,5 +1,5 @@
 /* =========================================================
-   装柜侠 · 自定义装载（拖拽装柜）· 界面与交互
+   智装柜 · 自定义装载（拖拽装柜）· 界面与交互
    基于原站 app.js：同一套 packer.js / smart.js / scene.js / geom.js / importer.js
    ========================================================= */
 import * as Packer from './packer.js';
@@ -711,7 +711,7 @@ async function sharePlan() {
   const st = state.result && state.result.stats;
   const text = '装柜方案 ' + state.container + (st ? ' · ' + st.placedCount + ' 件 · 装载率 ' + (st.utilization * 100).toFixed(1) + '%' : '');
   if (navigator.share) {
-    try { await navigator.share({ title: '装柜侠装柜方案', text, url }); return; }
+    try { await navigator.share({ title: '智装柜装柜方案', text, url }); return; }
     catch (e) { if (e && e.name === 'AbortError') return; }
   }
   copyText(url);
